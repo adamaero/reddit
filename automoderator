@@ -1,0 +1,187 @@
+# MULTIPLE FLAIR TERMS
+# by u/botania
+# reddit.com/r/YourSubreddit/comments/e30m3t/allow_users_to_flair_submissions_with_multiple
+#
+
+# 1. Check if user has permission to flair
+
+type: comment
+is_top_level: true
+moderators_exempt: true
+body (starts-with): ['++', '\++']
+author:
+    is_submitter: false
+    is_contributor: false
+action: remove
+message_subject: 'r/{{subreddit}} | Flair Permission Error'
+message: |
+    Dear u/{{author}}!  
+    Since you are neither an approved submitter, nor the OP, you do not 
+    have permission to flair [this submission]({{permalink}}).  
+    Your comment has been ignored.  
+    [More info](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs)  
+priority: -1
+---
+
+type: comment
+is_top_level: true
+moderators_exempt: true
+body (starts-with): ['++', '\++']
+author:
+    is_submitter: false
+    is_contributor: true
+parent_submission:
+    flair_css_class: 'index'
+action: remove
+message_subject: 'r/{{subreddit}} | Flair Permission Error'
+message: |
+    Dear u/{{author}}!  
+    Since the submission you are trying to flair has already been flaired, 
+    [your comment]({{permalink}}) has been ignored.  
+    [More info](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs)
+priority: -1
+---
+
+# 2. Check syntax
+
+type: comment
+is_top_level: true
+moderators_exempt: false
+body (starts-with): ['++', '\++']
+
+### Flair terms go here
+### ?!(flair1|flair2|flair3|etc)
+### Flair terms must be alphanumeric (numbers and letters only, no other symbols!)
+
+body (includes, regex): '(\+\+|.* )(?!(31\+ protein|26-30 g protein|21-25 g protein|16-20 g protein|noAddedSugar|glutenFree|ketoFriendly|wholeFoods)( |$))'
+
+###
+###
+
+message_subject: 'r/{{subreddit}} | Flair Syntax Error'
+message: |
+    Dear u/{{author}}!  
+    The syntax of [your flair command]({{permalink}}) seems to be faulty.  
+    
+    ---  
+    
+    Your comment reads:  
+    `{{body}}`  
+    The syntax error was found in the term right after:  
+    `{{match-2}}`  
+    
+    ---  
+    
+    Your comment has been ignored.
+    
+    ---
+    
+    Flair commands must...  
+    - Be executed by the OP, or an approved submitter. Approved submitters can
+    only flair submissions that haven't been flaired yet.  
+    - Be comments that start with `++`.  
+    - Consist of terms from 
+    [this list](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs#list), 
+    separated by single spaces.  
+    - Be at most 64 characters long after the `++`. This includes spaces.  
+    - Not include the same term twice.  
+    A valid example: `++flair1 flair2 flair3`  
+    [More info](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs)  
+action: remove
+priority: -2
+---
+
+# 3. Check for duplicates
+
+type: comment
+is_top_level: true
+moderators_exempt: false
+body (starts-with): ['++', '\++']
+body (includes, regex): '(\+\+| )(?P<term>\w+) .*(?P=term)'
+action: remove
+message_subject: 'r/{{subreddit}} | Flair Duplicate Error'
+message: |
+    Dear u/{{author}}!  
+    It looks like you are trying to use the same term twice in 
+    [your flair command]({{permalink}}). This is not allowed.
+    
+    ---
+    
+    Your comment reads:  
+    `{{body}}`  
+    The identified duplicate term:  
+    `{{match-3}}`
+    
+    ---
+    
+    Your comment has been ignored.
+    
+    ---
+    
+    Flair commands must...  
+    - Be executed by the OP, or an approved submitter. Approved submitters can
+    only flair submissions that haven't been flaired yet.  
+    - Be comments that start with `++`.  
+    - Consist of terms from 
+    [this list](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs#list), 
+    separated by single spaces.  
+    - Be at most 64 characters long after the `++`. This includes spaces.  
+    - Not include the same term twice.  
+    A valid example: `++flair1 flair2 flair3`  
+    [More info](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs)  
+priority: -3
+---
+
+# 4. Check length
+
+type: comment
+is_top_level: true
+moderators_exempt: false
+body (starts-with): ['++', '\++']
+body (includes, regex): '\+\+(.{64}).'
+action: remove
+message_subject: 'r/{{subreddit}} | Flair Length Error'
+message: |
+    Dear u/{{author}}!  
+    The flair you are [trying to assign]({{permalink}}) is too long. 
+    Flairs can only be 64 characters long.
+    
+    ---
+    
+    Your comment reads:  
+    `{{body}}`  
+    How the flair would be cut off:  
+    `{{match-2}}`
+    
+    ---
+    
+    Your comment has been ignored.
+    
+    ---
+    
+    Flair commands must...  
+    - Be executed by the OP, or an approved submitter. Approved submitters can
+    only flair submissions that haven't been flaired yet.  
+    - Be comments that start with `++`.  
+    - Consist of terms from 
+    [this list](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs#list), 
+    separated by single spaces.  
+    - Be at most 64 characters long after the `++`. This includes spaces.  
+    - Not include the same term twice.  
+    A valid example: `++flair1 flair2 flair3`  
+    [More info](https://www.reddit.com/r/{{subreddit}}/wiki/submission_flairs)  
+priority: -4
+---
+
+# 5. Apply flair
+
+type: comment
+is_top_level: true
+moderators_exempt: false
+body (full-exact, regex): '\\?\+\+((\w+ ?)+)'
+parent_submission:
+    set_flair: ['{{match-2}}', 'index']
+    overwrite_flair: true
+action: remove
+priority: -5
+---
