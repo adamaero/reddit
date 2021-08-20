@@ -1,0 +1,16 @@
+---
+type: title+body submission
+body: "date"      # or ["KEYWORD1", "KEYWORD2"] 
+comment: | 
+    Based on keywords, here are some [KEYWORD](url) ...stuff.
+    
+---
+type: title+body submission
+body: "baba"
+comment: | 
+    Based on keywords, here are some [KEYWORD](url) ...stuff.
+    
+---
+
+# automod one comment with links triggered by multiple keywords
+# https://www.reddit.com/r/AutoModerator/comments/fzs8bg/automod_answering_basic_faq_based_on_multiple/
